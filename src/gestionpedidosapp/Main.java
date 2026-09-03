@@ -58,7 +58,7 @@ public class Main {
                     break;
 
                 case 3:
-                    System.out.println("\nSaliendo del sistema de pedidos...");
+                    System.out.println("\n¡Gracias por su preferencia! Que tenga un excelente dia.");
                     break;
 
                 default:
