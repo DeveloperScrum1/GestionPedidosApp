@@ -58,7 +58,7 @@ public class Main {
                     break;
 
                 case 3:
-                    System.out.println("\nCierre de sesion exitoso. Operaciones guardadas en el sistema.");
+                    System.out.println("\nCierre de sesion exitoso. ¡Gracias por su preferencia!");
                     break;
 
                 default:
