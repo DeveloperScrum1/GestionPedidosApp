@@ -58,7 +58,7 @@ public class Main {
                     break;
 
                 case 3:
-                    System.out.println("\nSaliendo del sistema de pedidos...");
+                    System.out.println("\nCierre de sesion exitoso. Operaciones guardadas en el sistema.");
                     break;
 
                 default:
