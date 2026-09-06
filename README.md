@@ -27,5 +27,6 @@ Proyecto colaborativo desarrollado para la Práctica de Campo 1 del curso \*\*T�
 Aplicación de consola en Java que implementa la gestión básica de productos y pedidos, aplicando control de versiones con Git y GitHub mediante ramificación, resolución de conflictos y solicitudes de incorporación de cambios (Pull Requests).
 
 
-Estado del Proyecto: Version 2.0 estable con calculo de totales y excepciones.
+
+Estado del Proyecto: Version 2.0 actualizada por el equipo B.
 
