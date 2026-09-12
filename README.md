@@ -36,4 +36,3 @@ Estado del Proyecto
 
 Estado del Proyecto: Version 2.0 finalizada con integracion de clientes, calculo de totales, manejo de excepciones try-catch y aportes unificados del equipo.
 
-// linea de prueba para revert
