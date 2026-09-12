@@ -1,31 +1,39 @@
 package gestionpedidosapp;
 
-import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Producto> listaProductos = new ArrayList<>();
+        GestionProductos gestion = new GestionProductos();
         int opcion = 0;
+
+        // Precarga de prueba
+        try {
+            gestion.agregarProducto(new Producto("Laptop Gamer", 3450.00));
+            gestion.agregarProducto(new Producto("Mouse Optico", 55.00));
+        } catch (Exception e) {
+            System.out.println("Error en precarga: " + e.getMessage());
+        }
 
         do {
             System.out.println("\n==========================================");
-            System.out.println(" SISTEMA DE GESTION DE PEDIDOS V2 - UPN ");
+            System.out.println(" SISTEMA DE GESTION DE PEDIDOS V3 - UPN ");
             System.out.println("==========================================");
-            System.out.println("1. Registrar producto al pedido");
-            System.out.println("2. Listar productos del pedido");
-            System.out.println("3. Calcular importe total acumulado");
-            System.out.println("4. Salir");
-            System.out.print("Seleccione una opcion: ");
+            System.out.println("1. Registrar producto");
+            System.out.println("2. Listar productos de la coleccion");
+            System.out.println("3. Buscar producto por ID (Sobrecarga A)");
+            System.out.println("4. Buscar producto por Nombre (Sobrecarga B)");
+            System.out.println("5. Calcular importe total acumulado");
+            System.out.println("6. Salir");
+            System.out.print("Seleccione una opcion (1-6): ");
 
-            // Manejo de errores con try-catch para evitar caidas por entrada incorrecta
             try {
                 opcion = scanner.nextInt();
-                scanner.nextLine(); // Limpieza de buffer
+                scanner.nextLine(); // Limpiar buffer
             } catch (InputMismatchException e) {
-                System.out.println("Error: Ingrese un numero valido.");
+                System.out.println(">> Error: Debe ingresar un numero entero para la opcion.");
                 scanner.nextLine();
                 opcion = 0;
                 continue;
@@ -34,68 +42,91 @@ public class Main {
             switch (opcion) {
                 case 1:
                     System.out.println("\n--- REGISTRO DE PRODUCTO ---");
-                    System.out.print("Ingrese nombre: ");
-                    String nombre = scanner.nextLine();
+                    try {
+                        System.out.print("Ingrese nombre: ");
+                        String nombre = scanner.nextLine();
 
-                    double precio = 0.0;
-                    boolean precioValido = false;
-                    while (!precioValido) {
-                        try {
-                            System.out.print("Ingrese precio unitario (S/.): ");
-                            precio = scanner.nextDouble();
-                            scanner.nextLine();
-                            if (precio <= 0) {
-                                System.out.println("Error: El precio debe ser mayor a 0.");
-                            } else {
-                                precioValido = true;
-                            }
-                        } catch (InputMismatchException e) {
-                            System.out.println("Error de entrada: Ingrese un valor numerico.");
-                            scanner.nextLine();
-                        }
+                        System.out.print("Ingrese precio unitario (S/.): ");
+                        double precio = scanner.nextDouble();
+                        scanner.nextLine();
+
+                        // Construccion que dispara IllegalArgumentException si los datos son invalidos
+                        Producto nuevo = new Producto(nombre, precio);
+                        gestion.agregarProducto(nuevo);
+                        System.out.println(">> Producto registrado con exito.");
+
+                    } catch (InputMismatchException e) {
+                        System.out.println(">> [Error de Formato]: Ingrese un valor numerico valido para el precio.");
+                        scanner.nextLine();
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(">> [Error de Validacion]: " + e.getMessage());
                     }
-
-                    // Se aprovecha la sobrecarga del constructor con ID correlativo estatico
-                    listaProductos.add(new Producto(nombre, precio));
-                    System.out.println(">> Producto registrado con exito.");
                     break;
 
                 case 2:
                     System.out.println("\n--- LISTA DE PRODUCTOS ---");
-                    if (listaProductos.isEmpty()) {
-                        System.out.println("No hay productos registrados.");
+                    if (gestion.estaVacia()) {
+                        System.out.println("No hay productos registrados en la coleccion.");
                     } else {
-                        for (Producto p : listaProductos) {
+                        for (Producto p : gestion.getListaProductos()) {
                             p.mostrarDatos();
                         }
                     }
                     break;
 
                 case 3:
-                    System.out.println("\n--- CALCULO DE TOTALES ---");
-                    if (listaProductos.isEmpty()) {
-                        System.out.println("El pedido esta vacio.");
-                    } else {
-                        double subtotal = 0.0;
-                        double totalConIgv = 0.0;
-                        for (Producto p : listaProductos) {
-                            subtotal += p.getPrecio();
-                            totalConIgv += p.calcularPrecioFinal();
+                    System.out.println("\n--- BUSQUEDA POR ID (Sobrecarga int) ---");
+                    try {
+                        System.out.print("Ingrese el ID numerico a buscar: ");
+                        int idBuscar = scanner.nextInt();
+                        scanner.nextLine();
+
+                        Producto encontradoId = gestion.buscarProducto(idBuscar);
+                        if (encontradoId != null) {
+                            System.out.println(">> Producto encontrado:");
+                            encontradoId.mostrarDatos();
+                        } else {
+                            System.out.println(">> No existe producto con el ID: " + idBuscar);
                         }
-                        System.out.println("Items registrados: " + Producto.getContadorProductos());
-                        System.out.println("Subtotal general: S/. " + String.format("%.2f", subtotal));
-                        System.out.println("Total a pagar (con 18% IGV): S/. " + String.format("%.2f", totalConIgv));
+                    } catch (InputMismatchException e) {
+                        System.out.println(">> [Error de Entrada]: El ID debe ser un numero entero.");
+                        scanner.nextLine();
                     }
                     break;
 
                 case 4:
-                    System.out.println("\nCierre de sesion exitoso. ¡Gracias por su preferencia!");
+                    System.out.println("\n--- BUSQUEDA POR NOMBRE (Sobrecarga String) ---");
+                    System.out.print("Ingrese el nombre exacto a buscar: ");
+                    String nombreBuscar = scanner.nextLine();
+
+                    Producto encontradoNom = gestion.buscarProducto(nombreBuscar);
+                    if (encontradoNom != null) {
+                        System.out.println(">> Producto encontrado:");
+                        encontradoNom.mostrarDatos();
+                    } else {
+                        System.out.println(">> No existe producto con el nombre: " + nombreBuscar);
+                    }
+                    break;
+
+                case 5:
+                    System.out.println("\n--- CALCULO DE TOTALES ---");
+                    if (gestion.estaVacia()) {
+                        System.out.println("El pedido esta vacio.");
+                    } else {
+                        System.out.println("Items registrados: " + gestion.totalRegistrados());
+                        System.out.println("Subtotal general: S/. " + String.format("%.2f", gestion.calcularSubtotalGeneral()));
+                        System.out.println("Total con 18% IGV: S/. " + String.format("%.2f", gestion.calcularTotalGeneralConIgv()));
+                    }
+                    break;
+
+                case 6:
+                    System.out.println("\nCierre de sesion exitoso.");
                     break;
 
                 default:
-                    System.out.println("Opcion no valida. Intente de nuevo.");
+                    System.out.println(">> Opcion fuera de rango. Seleccione entre 1 y 6.");
             }
-        } while (opcion != 4);
+        } while (opcion != 6);
 
         scanner.close();
     }

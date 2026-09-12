@@ -1,50 +1,74 @@
 package gestionpedidosapp;
 
 public class Producto {
-    // Variable estatica para autogenerar correlativos y contar productos creados
     private static int contadorProductos = 0;
     
     private int id;
     private String nombre;
     private double precio;
 
-    // Constructor principal
+    // Constructor principal con control de excepciones de dominio
     public Producto(int id, String nombre, double precio) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser un numero positivo mayor a 0.");
+        }
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del producto no puede estar vacio.");
+        }
+        if (precio <= 0) {
+            throw new IllegalArgumentException("El precio del producto debe ser mayor a 0.");
+        }
+
         this.id = id;
-        this.nombre = nombre;
+        this.nombre = nombre.trim();
         this.precio = precio;
         contadorProductos++;
     }
 
-    // Sobrecarga de constructor: crea un producto asignando ID automatico mediante static
+    // Sobrecarga de constructor con correlativo autogenerado
     public Producto(String nombre, double precio) {
         this(++contadorProductos, nombre, precio);
     }
 
-    // Metodo estatico para consultar el total acumulado
     public static int getContadorProductos() {
         return contadorProductos;
     }
 
-    // Sobrecarga de metodos: calcular precio con IGV (18%)
+    // Sobrecarga 1 (Calculo básico con 18% IGV)
     public double calcularPrecioFinal() {
         return this.precio * 1.18;
     }
 
-    // Sobrecarga de metodos: calcular precio aplicando porcentaje de descuento
+    // Sobrecarga 2 (Calculo con descuento especial + 18% IGV)
     public double calcularPrecioFinal(double porcentajeDescuento) {
-        double subtotalConDescuento = this.precio * (1 - (porcentajeDescuento / 100));
+        if (porcentajeDescuento < 0 || porcentajeDescuento > 100) {
+            throw new IllegalArgumentException("El porcentaje de descuento debe estar entre 0 y 100.");
+        }
+        double subtotalConDescuento = this.precio * (1 - (porcentajeDescuento / 100.0));
         return subtotalConDescuento * 1.18;
     }
 
     public void mostrarDatos() {
-        System.out.println("ID: " + id + " | Nombre: " + nombre + " | Precio base: S/. " + precio + " | Total (+18% IGV): S/. " + String.format("%.2f", calcularPrecioFinal()));
+        System.out.println(String.format("ID: %-4d | Nombre: %-22s | Precio base: S/. %-8.2f | Total c/IGV: S/. %-8.2f",
+                id, nombre, precio, calcularPrecioFinal()));
     }
 
+    // Getters y Setters con validaciones
     public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public void setId(int id) {
+        if (id <= 0) throw new IllegalArgumentException("El ID debe ser mayor a 0.");
+        this.id = id;
+    }
+
     public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setNombre(String nombre) {
+        if (nombre == null || nombre.trim().isEmpty()) throw new IllegalArgumentException("El nombre no puede estar vacio.");
+        this.nombre = nombre.trim();
+    }
+
     public double getPrecio() { return precio; }
-    public void setPrecio(double precio) { this.precio = precio; }
+    public void setPrecio(double precio) {
+        if (precio <= 0) throw new IllegalArgumentException("El precio debe ser mayor a 0.");
+        this.precio = precio;
+    }
 }
