@@ -74,6 +74,18 @@ public class GestionProductos {
         return filtrados;
     }
 
+    // Aporte Integrante 7: Eliminación segura de un producto por ID con validación de existencia
+    public boolean eliminarProducto(int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("El ID para eliminar debe ser mayor a 0.");
+        }
+        Producto encontrado = buscarProducto(id);
+        if (encontrado == null) {
+            throw new IllegalArgumentException("No se puede eliminar: No existe producto con el ID " + id);
+        }
+        return listaProductos.remove(encontrado);
+    }
+
     public ArrayList<Producto> getListaProductos() {
         return listaProductos;
     }

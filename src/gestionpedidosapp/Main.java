@@ -29,8 +29,9 @@ public class Main {
             System.out.println("4. Buscar producto por Nombre (Sobrecarga B)");
             System.out.println("5. Buscar productos por rango de precio");
             System.out.println("6. Calcular importe total o con descuento");
-            System.out.println("7. Salir");
-            System.out.print("Seleccione una opcion (1-7): ");
+            System.out.println("7. Eliminar producto por ID");
+            System.out.println("8. Salir");
+            System.out.print("Seleccione una opcion (1-8): ");
 
             // Aporte Integrante 6: Manejo integral de excepciones para evitar caídas del sistema
             try {
@@ -172,13 +173,30 @@ public class Main {
                     break;
 
                 case 7:
+                    System.out.println("\n--- ELIMINAR PRODUCTO ---");
+                    try {
+                        System.out.print("Ingrese el ID del producto a eliminar: ");
+                        int idEliminar = scanner.nextInt();
+                        scanner.nextLine();
+
+                        gestion.eliminarProducto(idEliminar);
+                        System.out.println(">> Producto con ID " + idEliminar + " eliminado exitosamente de la coleccion.");
+                    } catch (InputMismatchException e) {
+                        System.out.println(">> [Error de Formato]: El ID debe ser un numero entero.");
+                        scanner.nextLine();
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(">> [Error de Validacion]: " + e.getMessage());
+                    }
+                    break;
+
+                case 8:
                     System.out.println("\nCierre de sesion exitoso.");
                     break;
 
                 default:
-                    System.out.println(">> Opcion no valida. Seleccione entre 1 y 7.");
+                    System.out.println(">> Opcion no valida. Seleccione entre 1 y 8.");
             }
-        } while (opcion != 7);
+        } while (opcion != 8);
 
         scanner.close();
     }
