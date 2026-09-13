@@ -3,14 +3,12 @@ package gestionpedidosapp;
 import java.util.ArrayList;
 
 public class GestionProductos {
-    // Coleccion principal requerida
     private ArrayList<Producto> listaProductos;
 
     public GestionProductos() {
         this.listaProductos = new ArrayList<>();
     }
 
-    // Operacion sobre la coleccion: Registrar con validacion
     public void agregarProducto(Producto p) {
         if (p == null) {
             throw new IllegalArgumentException("No se puede registrar un producto nulo.");
@@ -18,11 +16,28 @@ public class GestionProductos {
         this.listaProductos.add(p);
     }
 
-    // ============================================================
-    // SOBRECARGA REQUERIDA: Metodos de busqueda sobre la coleccion
-    // ============================================================
+    // Aporte Integrante 3: Sobrecarga del método agregarProducto
+    public void agregarProducto(String nombre, double precio) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre es requerido.");
+        }
+        if (precio <= 0) {
+            throw new IllegalArgumentException("El precio debe ser mayor a cero.");
+        }
+        Producto nuevo = new Producto(nombre, precio);
+        this.agregarProducto(nuevo);
+    }
 
-    // Metodo Sobrecargado 1: Busqueda exacta por ID numerico
+    public void registrarConValidacion(Producto p) throws Exception {
+        if (p == null) {
+            throw new IllegalArgumentException("El producto no puede ser nulo.");
+        }
+        if (buscarProducto(p.getId()) != null) {
+            throw new Exception("Conflicto de negocio: Ya existe un producto con el ID " + p.getId());
+        }
+        this.agregarProducto(p);
+    }
+
     public Producto buscarProducto(int id) {
         for (Producto p : listaProductos) {
             if (p.getId() == id) {
@@ -32,7 +47,6 @@ public class GestionProductos {
         return null;
     }
 
-    // Metodo Sobrecargado 2: Busqueda por Nombre (coincidencia de texto)
     public Producto buscarProducto(String nombre) {
         if (nombre == null || nombre.trim().isEmpty()) {
             return null;
