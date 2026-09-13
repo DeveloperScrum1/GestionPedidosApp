@@ -28,6 +28,7 @@ public class GestionProductos {
         this.agregarProducto(nuevo);
     }
 
+    // Aporte Integrante 2: Validación de duplicidad con excepción de negocio
     public void registrarConValidacion(Producto p) throws Exception {
         if (p == null) {
             throw new IllegalArgumentException("El producto no puede ser nulo.");
@@ -57,6 +58,20 @@ public class GestionProductos {
             }
         }
         return null;
+    }
+
+    // Aporte Integrante 5: Búsqueda y filtrado por rango de precios en la colección
+    public ArrayList<Producto> buscarPorRangoPrecio(double min, double max) {
+        if (min < 0 || max < min) {
+            throw new IllegalArgumentException("El rango de precios es invalido (el minimo no puede superar al maximo).");
+        }
+        ArrayList<Producto> filtrados = new ArrayList<>();
+        for (Producto p : listaProductos) {
+            if (p.getPrecio() >= min && p.getPrecio() <= max) {
+                filtrados.add(p);
+            }
+        }
+        return filtrados;
     }
 
     public ArrayList<Producto> getListaProductos() {

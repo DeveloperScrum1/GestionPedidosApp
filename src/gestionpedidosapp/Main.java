@@ -1,5 +1,6 @@
 package gestionpedidosapp;
 
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -13,6 +14,7 @@ public class Main {
         try {
             gestion.agregarProducto(new Producto("Laptop Gamer", 3450.00));
             gestion.agregarProducto(new Producto("Mouse Optico", 55.00));
+            gestion.agregarProducto(new Producto("Teclado Mecanico", 180.00));
         } catch (Exception e) {
             System.out.println("Error en precarga: " + e.getMessage());
         }
@@ -21,14 +23,16 @@ public class Main {
             System.out.println("\n==========================================");
             System.out.println(" SISTEMA DE GESTION DE PEDIDOS V3 - UPN ");
             System.out.println("==========================================");
-            System.out.println("1. Registrar producto");
+            System.out.println("1. Registrar producto con validacion");
             System.out.println("2. Listar productos de la coleccion");
             System.out.println("3. Buscar producto por ID (Sobrecarga A)");
             System.out.println("4. Buscar producto por Nombre (Sobrecarga B)");
-            System.out.println("5. Calcular importe total acumulado");
-            System.out.println("6. Salir");
-            System.out.print("Seleccione una opcion (1-6): ");
+            System.out.println("5. Buscar productos por rango de precio");
+            System.out.println("6. Calcular importe total o con descuento");
+            System.out.println("7. Salir");
+            System.out.print("Seleccione una opcion (1-7): ");
 
+            // Aporte Integrante 6: Manejo integral de excepciones para evitar caídas del sistema
             try {
                 opcion = scanner.nextInt();
                 scanner.nextLine(); // Limpiar buffer
@@ -50,13 +54,12 @@ public class Main {
                         double precio = scanner.nextDouble();
                         scanner.nextLine();
 
-                        // Construccion que dispara IllegalArgumentException si los datos son invalidos
-                        Producto nuevo = new Producto(nombre, precio);
-                        gestion.agregarProducto(nuevo);
+                        // Usa la sobrecarga del Integrante 3
+                        gestion.agregarProducto(nombre, precio);
                         System.out.println(">> Producto registrado con exito.");
 
                     } catch (InputMismatchException e) {
-                        System.out.println(">> [Error de Formato]: Ingrese un valor numerico valido para el precio.");
+                        System.out.println(">> [Error de Formato]: El precio debe ser un numero.");
                         scanner.nextLine();
                     } catch (IllegalArgumentException e) {
                         System.out.println(">> [Error de Validacion]: " + e.getMessage());
@@ -77,7 +80,7 @@ public class Main {
                 case 3:
                     System.out.println("\n--- BUSQUEDA POR ID (Sobrecarga int) ---");
                     try {
-                        System.out.print("Ingrese el ID numerico a buscar: ");
+                        System.out.print("Ingrese el ID a buscar: ");
                         int idBuscar = scanner.nextInt();
                         scanner.nextLine();
 
@@ -89,7 +92,7 @@ public class Main {
                             System.out.println(">> No existe producto con el ID: " + idBuscar);
                         }
                     } catch (InputMismatchException e) {
-                        System.out.println(">> [Error de Entrada]: El ID debe ser un numero entero.");
+                        System.out.println(">> [Error]: El ID debe ser un valor entero.");
                         scanner.nextLine();
                     }
                     break;
@@ -109,6 +112,32 @@ public class Main {
                     break;
 
                 case 5:
+                    System.out.println("\n--- BUSQUEDA POR RANGO DE PRECIOS ---");
+                    try {
+                        System.out.print("Ingrese precio minimo: S/. ");
+                        double min = scanner.nextDouble();
+                        System.out.print("Ingrese precio maximo: S/. ");
+                        double max = scanner.nextDouble();
+                        scanner.nextLine();
+
+                        ArrayList<Producto> filtrados = gestion.buscarPorRangoPrecio(min, max);
+                        if (filtrados.isEmpty()) {
+                            System.out.println(">> No se encontraron productos en ese rango.");
+                        } else {
+                            System.out.println(">> Productos encontrados (" + filtrados.size() + "):");
+                            for (Producto p : filtrados) {
+                                p.mostrarDatos();
+                            }
+                        }
+                    } catch (InputMismatchException e) {
+                        System.out.println(">> [Error]: Ingrese valores numericos para el rango.");
+                        scanner.nextLine();
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(">> [Error de Validacion]: " + e.getMessage());
+                    }
+                    break;
+
+                case 6:
                     System.out.println("\n--- CALCULO DE TOTALES ---");
                     if (gestion.estaVacia()) {
                         System.out.println("El pedido esta vacio.");
@@ -116,17 +145,40 @@ public class Main {
                         System.out.println("Items registrados: " + gestion.totalRegistrados());
                         System.out.println("Subtotal general: S/. " + String.format("%.2f", gestion.calcularSubtotalGeneral()));
                         System.out.println("Total con 18% IGV: S/. " + String.format("%.2f", gestion.calcularTotalGeneralConIgv()));
+
+                        // Opción de descuento
+                        try {
+                            System.out.print("¿Desea simular descuento para un producto? (Ingrese ID o 0 para omitir): ");
+                            int idDesc = scanner.nextInt();
+                            if (idDesc > 0) {
+                                Producto pDesc = gestion.buscarProducto(idDesc);
+                                if (pDesc != null) {
+                                    System.out.print("Ingrese % de descuento (0-100): ");
+                                    double desc = scanner.nextDouble();
+                                    double finalDesc = pDesc.calcularPrecioFinal(desc);
+                                    System.out.println(">> Precio final con " + desc + "% de descuento + IGV: S/. " + String.format("%.2f", finalDesc));
+                                } else {
+                                    System.out.println(">> Producto no encontrado.");
+                                }
+                            }
+                            scanner.nextLine();
+                        } catch (InputMismatchException e) {
+                            System.out.println(">> [Error]: Entrada numerica invalida.");
+                            scanner.nextLine();
+                        } catch (IllegalArgumentException e) {
+                            System.out.println(">> [Error]: " + e.getMessage());
+                        }
                     }
                     break;
 
-                case 6:
+                case 7:
                     System.out.println("\nCierre de sesion exitoso.");
                     break;
 
                 default:
-                    System.out.println(">> Opcion fuera de rango. Seleccione entre 1 y 6.");
+                    System.out.println(">> Opcion no valida. Seleccione entre 1 y 7.");
             }
-        } while (opcion != 6);
+        } while (opcion != 7);
 
         scanner.close();
     }
